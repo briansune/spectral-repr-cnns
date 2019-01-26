@@ -1,5 +1,6 @@
 # Spectral CNN under Cifar10
 Coded by: Aarshay Jain, Jared Samet, Alex Wainger  
+Modified by: BrianSune that works on Windows platform.  
 Spectral Representations for Convolutional Neural Networks  
 This repo is an implementation of Rippel, Snoek, and Adams 2015 (https://arxiv.org/pdf/1506.03767.pdf).  
 
