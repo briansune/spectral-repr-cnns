@@ -15,21 +15,10 @@ Two of the notebooks refer to the saved models which contain the weights for our
 
 ## Code Organization
 
-All code is located in the ```src``` folder. Within that folder, Python functions and classes that are shared between multiple notebooks are all located in the ```modules``` folder.
-
-## Notebooks
-
-[```approximation-loss.ipynb```](src/approximation-loss.ipynb) - This notebook demonstrates spectral pooling and frequency dropout in action on a minibatch. It also replicates the results for the approximation loss from the original paper.
-
-[```cnn_spectral_parameterization.ipynb```](src/cnn_spectral_parameterization.ipynb) - This notebook replicates the comparison of convergence time (measured in epochs) for traditionally vs spectrally parameterized CNNs.
-
-[```figure2.ipynb```](src/figure2.ipynb) - This notebook uses the spectral_pool function to downsample an image.
-
-[```hyperparameter-search.ipynb```](src/hyperparameter-search.ipynb) - This notebook performs hyperparameter search on the CIFAR-10 dataset to identify the best hyperparameters.
-
-[```full-training-10.ipynb```](src/full-training-10.ipynb) - This notebook uses the best identified hyperparameters to train the network on the entire CIFAR-10 dataset and compute the test accuracy. It also shows the improved results we got from manual tuning of the hyperparameters. Before running this notebook, unzip ```src/best_model_10.tar.gz```.
-
-[```full-training-100.ipynb```](src/full-training-100.ipynb) - This notebook uses the best identified hyperparameters to train the network on the entire CIFAR-100 dataset and compute the test accuracy. It also shows the improved results we got from manual tuning of the hyperparameters. Before running this notebook, unzip ```src/best_model_100.tar.gz```.
+All code is located in the ```src``` folder.  
+Python functions and classes that are shared between multiple notebooks are all located in the ```modules``` folder.  
+Main python scripts are found in modules.  
+Other functions are in the sub folder lib.  
 
 ## Modules
 
