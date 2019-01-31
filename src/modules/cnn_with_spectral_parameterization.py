@@ -140,6 +140,7 @@ class CNN_Spectral_Param():
 				Ensure Tensorflow arrange the data in a best settings.
 			"""
 			config = tf.ConfigProto(allow_soft_placement=True,log_device_placement=False)
+			#config.gpu_options.allow_growth = True
 			
 			with tf.Session(config=config) as sess:
 				
