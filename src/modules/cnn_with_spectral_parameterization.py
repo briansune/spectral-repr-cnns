@@ -27,7 +27,7 @@ class CNN_Spectral_Param():
 		use_spectral_params=True,
 		kernel_size=3,
 		l2_norm=0.01,
-		learning_rate=1e-4,
+		learning_rate=1e-3,
 		data_format='NHWC',
 		random_seed=0,
 		verbose=True
@@ -150,7 +150,7 @@ class CNN_Spectral_Param():
 
 				iter_total=0
 				for epc in range(epochs):
-					print("epoch {} ".format(epc + 1))
+					print("epoch {} , learning rate {}".format(epc + 1, self.learning_rate))
 
 					# Apply vertical translations and random horizontal flips
 					if epc % 4 == 0 or epc % 4 == 1:
@@ -163,10 +163,10 @@ class CNN_Spectral_Param():
 					if np.random.randint(2, size=1)[0] == 1:
 						img_gen.flip(mode='h')
 
-					loss_in_epoch=[]
-					train_acc_in_epoch=[]
-					error_rate_in_epoch=[]
-					train_eve_in_epoch = []
+					loss_in_epoch       = []
+					train_acc_in_epoch  = []
+					error_rate_in_epoch = []
+					train_eve_in_epoch  = []
 					
 					for itr in range(iters):
 						iter_total += 1
@@ -542,13 +542,13 @@ class CNN_Spectral_Param():
 				conv_kernels=[v for v in tf.trainable_variables() if 'kernel' in v.name]
 				l2_loss=tf.reduce_sum([tf.norm(w, axis=[-2, -1]) for w in conv_kernels if w.shape[0] == 3])
 				l2_loss += tf.reduce_sum([tf.norm(w, axis=[-2, -1]) for w in conv_kernels if w.shape[0] == 1])
-
+			
 			label=tf.one_hot(input_y, self.num_output)
 			cross_entropy_loss=tf.reduce_mean(
 				tf.nn.softmax_cross_entropy_with_logits(labels=label, logits=global_avg),
 				name='cross_entropy')
 			loss=tf.add(cross_entropy_loss, self.l2_norm * l2_loss, name='loss')
-
+		
 		return global_avg, loss
 
 if __name__ == "__main__":
