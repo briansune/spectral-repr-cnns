@@ -8,26 +8,29 @@ import time
 from lib.utils import load_cifar10
 
 
+"""======================================================================================
+	CNN with spectral pooling layers and options for convolution layers.
+"""
 class CNN_Spectral_Pool(object):
-	"""CNN with spectral pooling layers and options for convolution layers."""
 
 	def __init__(self,
-				 num_output=10,
-				 M=5,
-				 conv_filter_size=3,
-				 gamma=0.85,
-				 alpha=0.3,
-				 beta=0.15,
-				 weight_decay=1e-3,
-				 momentum=0.95,
-				 learning_rate=0.0088,
-				 l2_norm=0.0001,
-				 lr_reduction_epochs=[90, 190],
-				 lr_reduction_factor=0.1,
-				 max_num_filters=288,
-				 random_seed=0,
-				 verbose=True,
-				 use_spectral_parameterization=True):
+		num_output=10,
+		M=5,
+		conv_filter_size=3,
+		gamma=0.85,
+		alpha=0.3,
+		beta=0.15,
+		weight_decay=1e-3,
+		momentum=0.95,
+		learning_rate=0.0088,
+		l2_norm=0.0001,
+		lr_reduction_epochs=[90, 190],
+		lr_reduction_factor=0.1,
+		max_num_filters=288,
+		random_seed=0,
+		verbose=True,
+		use_spectral_parameterization=True
+	):
 		"""Initialize model.
 
 		Defaults are set as per the optimum hyperparameters stated in
@@ -55,29 +58,29 @@ class CNN_Spectral_Pool(object):
 
 		# some internal variables:
 		self.layers = []
-
-	def _get_cnn_num_filters(self, m):
-		"""Get number of filters for CNN.
-
+	
+	"""==================================================================================
+		Get number of filters for CNN.
 		Args:
 			m: current layer number
-		"""
-		return min(self.max_num_filters,
-				   96 + 32 * m)
-
-	def _get_sp_dim(self, n):
-		"""Get filter size for current layer.
-
+	"""
+	def _get_cnn_num_filters(self, m):
+		
+		return min(self.max_num_filters, 96 + 32 * m)
+	
+	"""==================================================================================
+		Get filter size for current layer.
 		Args:
 			n: size of image in layer
-		"""
+	"""
+	def _get_sp_dim(self, n):
+		
 		fsize = int(self.gamma * n)
 		# minimum size is 3:
 		return max(3, fsize)
-
-	def _get_frq_dropout_bounds(self, n, m):
-		"""Get the bounds for frequency dropout.
-
+	
+	"""==================================================================================
+		Get the bounds for frequency dropout.
 		Args:
 			n: size of image in layer
 			m: current layer index
@@ -89,7 +92,9 @@ class CNN_Spectral_Pool(object):
 		This function implements the linear parameterization of the
 		probability distribution for frequency dropout as described in
 		section 5.1.
-		"""
+	"""
+	def _get_frq_dropout_bounds(self, n, m):
+	
 		c = self.alpha + (m / self.M) * (self.beta - self.alpha)
 
 		freq_dropout_lower_bound = c * (1. + n // 2)
@@ -333,16 +338,19 @@ class CNN_Spectral_Pool(object):
 			error_num = tf.count_nonzero(pred - input_y, name='error_num')
 			tf.summary.scalar('model_error_num', error_num)
 		return error_num
-
-	def train(self, X_train, y_train, X_val, y_val,
-			  batch_size=512, epochs=10, val_test_frq=1,
-			  extra_conv_layer=True,
-			  use_global_averaging=True,
-			  model_name='test',
-			  restore_checkpoint=None):
-		"""Train the CNN.
-		This function was adapted from the homework assignments.
-		"""
+	
+	"""
+		Train the CNN.
+	"""
+	def train(self,
+		X_train, y_train, X_val, y_val,
+		batch_size=512, epochs=10, val_test_frq=1,
+		extra_conv_layer=True,
+		use_global_averaging=True,
+		model_name='test',
+		restore_checkpoint=None
+	):
+		
 		full_model_name = '{0}_{1}'.format(model_name, time.time())
 		self.full_model_name = full_model_name
 		self.train_loss = []
@@ -457,13 +465,13 @@ class CNN_Spectral_Pool(object):
 						val_batch_y = y_val[val_itr * batch_size: (1 + val_itr) * batch_size]
 						
 						valid_eve_iter, valid_loss_iter, merge_result_iter = sess.run(
-								[eve, loss, merge],
-								feed_dict={
-									xs: val_batch_x,
-									ys: val_batch_y,
-									train_phase: False
-								}
-							)
+							[eve, loss, merge],
+							feed_dict={
+								xs: val_batch_x,
+								ys: val_batch_y,
+								train_phase: False
+							}
+						)
 						val_eves.append(valid_eve_iter)
 						val_losses.append(valid_loss_iter)
 						merge_results.append(merge_result_iter)
@@ -508,10 +516,8 @@ class CNN_Spectral_Pool(object):
 			full_model_name
 		))
 
-	def calc_test_accuracy(
-		self,
-		xtest,
-		ytest,
+	def calc_test_accuracy(self,
+		xtest, ytest,
 		full_model_name,
 		batch_size=500
 	):
@@ -526,29 +532,31 @@ class CNN_Spectral_Pool(object):
 		output, _ = self.build_graph(xs, ys, train_phase)
 		eve = self.evaluate(output, ys)
 		iters = int(xtest.shape[0] / batch_size)
-		print('number of batches for testing: {}'.format(
-			iters
-		))
+		print('number of batches for testing: {}'.format(iters))
 
 		init = tf.global_variables_initializer()
 		with tf.Session() as sess:
+			
 			saver = tf.train.Saver()
 			sess.run(init)
 			# restore the pre_trained
 			print("Loading pre-trained model")
 			saver.restore(sess, 'model/{}'.format(full_model_name))
 			test_eves = []
+			
 			for itr in range(iters):
-				X_batch = xtest[itr * batch_size:
-								(1 + itr) * batch_size]
-				y_batch = ytest[itr * batch_size:
-								(1 + itr) * batch_size]
-				test_iter_eve = sess.run(eve, feed_dict={
-					xs: X_batch,
-					ys: y_batch,
-					train_phase: False
-				})
+				X_batch = xtest[itr * batch_size : (1 + itr) * batch_size]
+				y_batch = ytest[itr * batch_size : (1 + itr) * batch_size]
+				test_iter_eve = sess.run(
+					eve,
+					feed_dict={
+						xs: X_batch,
+						ys: y_batch,
+						train_phase: False
+					}
+				)
 				test_eves.append(test_iter_eve)
+			
 			test_eve = np.mean(test_eves)
 			test_acc = 100 - test_eve * 100 / y_batch.shape[0]
 			print('Test accuracy: {:.3f}'.format(test_acc))
