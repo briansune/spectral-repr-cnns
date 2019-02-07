@@ -69,11 +69,12 @@ def _common_spectral_pool(images, filter_size):
 		)
 	return all_together
 
-
-def _tfshift(matrix, n, axis=1, invert=False):
-	"""Handler for shifting one axis at a time.
+"""==================================================================================
+	Handler for shifting one axis at a time.
 	Helpful for fftshift if invert is False and ifftshift otherwise
-	"""
+"""
+def _tfshift(matrix, n, axis=1, invert=False):
+	
 	if invert:
 		mid = n - (n + 1) // 2
 	else:
@@ -93,41 +94,45 @@ def _tfshift(matrix, n, axis=1, invert=False):
 	)
 	return out
 
-
-def tf_fftshift(matrix, n):
-	"""Performs similar function to numpy's fftshift
+"""==================================================================================
+	Performs similar function to numpy's fftshift
 	Note: Takes image as a channel first numpy array of shape:
 		(batch_size, channels, height, width)
-	"""
+"""
+def tf_fftshift(matrix, n):
+	
 	mat = _tfshift(matrix, n, 1)
 	mat2 = _tfshift(mat, n, 0)
 	return mat2
 
-
-def tf_ifftshift(matrix, n):
-	"""Performs similar function to numpy's ifftshift
+"""==================================================================================
+	Performs similar function to numpy's ifftshift
 	Note: Takes image as a channel first numpy array of shape:
 		(batch_size, channels, height, width)
-	"""
+"""
+def tf_ifftshift(matrix, n):
+	
 	mat = _tfshift(matrix, n, 1, invert=True)
 	mat2 = _tfshift(mat, n, 0, invert=True)
 	return mat2
 
-
-def spectral_pool(image, filter_size=3,
-				  return_fft=False,
-				  return_transformed=False,
-				  ):
-	""" Perform a single spectral pool operation.
+"""================================================================================== 
+	Perform a single spectral pool operation.
 	Args:
 		image: numpy array representing an image, channels last
 			shape: (batch_size, height, width, channel)
 		filter_size: the final dimension of the filter required
 		return_fft: bool, if True function also returns the raw
-						  fourier transform
+			fourier transform
 	Returns:
 		An image of same shape as input
-	"""
+"""
+def spectral_pool(
+	image, filter_size=3,
+	return_fft=False,
+	return_transformed=False,
+):
+	
 	# add dimension to image:
 	tf.reset_default_graph()
 	im = tf.placeholder(shape=image.shape, dtype=tf.float32)
@@ -183,8 +188,8 @@ def spectral_pool(image, filter_size=3,
 			)
 			return im_new
 
-def max_pool(image, pool_size=2):
-	""" Perform a single max pool operation.
+"""================================================================================== 
+	Perform a single max pool operation.
 	Args:
 		image: numpy array representing an image
 			shape: (num_images, height, width, channel)
@@ -192,7 +197,9 @@ def max_pool(image, pool_size=2):
 				   same as the filter size of max_pool
 	Returns:
 		An image of shape (n, n, 1) if grayscale is True or same as input
-	"""
+"""
+def max_pool(image, pool_size=2):
+	
 	imsize = image.shape[1]
 
 	im_channel_last = np.moveaxis(image, 0, 2)
@@ -211,16 +218,17 @@ def max_pool(image, pool_size=2):
 	
 	return im_new
 
-
-def l2_loss_images(orig_images, mod_images):
-	"""Calculates the loss for a set of modified images vs original
+"""==================================================================================
+	Calculates the loss for a set of modified images vs original
 	formular: l2(orig-mod)/l2(orig)
 	Args:
 		orig_images: numpy array size (batch, dims..)
 		mod_images: numpy array of same dim as orig_images
 	Returns:
 		single value, i.e. loss
-	"""
+"""
+def l2_loss_images(orig_images, mod_images):
+	
 	n = orig_images.shape[0]
 	# convert to 2d:
 	oimg = orig_images.reshape(n, -1)
