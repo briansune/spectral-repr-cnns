@@ -7,24 +7,25 @@ import tensorflow as tf
 
 class default_conv_layer(object):
 	
+	"""==================================================================================
+		NOTE: Image should be CHANNEL FIRST
+		This class has been partially adapted from the homework assignments
+		given by the TAs
+		:param input_x: Should be a 4D array like:
+			(batch_num, channel_num, img_len, img_len)
+		:param in_channel: The number of channels
+		:param out_channel: number of filters required
+		:param kernel_shape: kernel size
+		:param rand_seed: random seed
+		:param index: The layer index used for naming
+	"""
 	def __init__(self,
 		input_x, in_channel, out_channel,
 		kernel_shape, rand_seed,
 		activation=tf.nn.relu,
 		m=0
 	):
-		"""
-		NOTE: Image should be CHANNEL FIRST
-		This class has been partially adapted from the homework assignments
-		given by the TAs
-		:param input_x: Should be a 4D array like:
-							(batch_num, channel_num, img_len, img_len)
-		:param in_channel: The number of channels
-		:param out_channel: number of filters required
-		:param kernel_shape: kernel size
-		:param rand_seed: random seed
-		:param index: The layer index used for naming
-		"""
+	
 		assert len(input_x.shape) == 4
 		assert input_x.shape[2] == input_x.shape[3]
 		assert input_x.shape[1] == in_channel
@@ -93,11 +94,7 @@ class default_conv_layer(object):
 
 class fc_layer(object):
 	
-	def __init__(self,
-		input_x, in_size, out_size, rand_seed,
-		activation_function=None, m=0
-	):
-		"""
+	"""==================================================================================
 		Implementing fully-connected layers.
 		This class has been partially adapted from the homework assignments
 		given by the TAs
@@ -112,7 +109,12 @@ class fc_layer(object):
 		:param activation_function: The activation function
 			for the output. Default set to None.
 		:param index: The index of the layer. It is used for naming only.
-		"""
+	"""
+	def __init__(self,
+		input_x, in_size, out_size, rand_seed,
+		activation_function=None, m=0
+	):
+		
 		with tf.variable_scope('fc_layer_{0}'.format(m)):
 			with tf.name_scope('fc_kernel'):
 				w_shape = [in_size, out_size]
@@ -145,20 +147,13 @@ class fc_layer(object):
 		return self.cell_out
 
 
+"""======================================================================================
+	Spectral pooling layer.
+"""
 class spectral_pool_layer(object):
-	"""Spectral pooling layer."""
-
-	def __init__(self,
-		input_x,
-		filter_size=3,
-		freq_dropout_lower_bound=None,
-		freq_dropout_upper_bound=None,
-		activation=tf.nn.relu,
-		m=0,
-		train_phase=False
-	):
-		"""Perform a single spectral pool operation.
-
+	
+	"""==================================================================================
+		Perform a single spectral pool operation.
 		Args:
 			input_x: Tensor representing a batch of channels-first images
 				shape: (batch_size, num_channels, height, width)
@@ -169,10 +164,19 @@ class spectral_pool_layer(object):
 				above which all frequencies should be truncated
 			train_phase: tf.bool placeholder or Python boolean,
 				but using a Python boolean is probably wrong
-
 		Returns:
 			An image of similar shape as input after reduction
-		"""
+	"""
+	def __init__(self,
+		input_x,
+		filter_size=3,
+		freq_dropout_lower_bound=None,
+		freq_dropout_upper_bound=None,
+		activation=tf.nn.relu,
+		m=0,
+		train_phase=False
+	):
+	
 		# assert only 1 dimension passed for filter size
 		assert isinstance(filter_size, int)
 
@@ -232,18 +236,22 @@ class spectral_pool_layer(object):
 
 
 class spectral_conv_layer(object):
-	def __init__(self, input_x, in_channel, out_channel,
-				 kernel_size, random_seed, data_format='NHWC', m=0):
-		"""
+	
+	"""==================================================================================
 		NOTE: Image should be CHANNEL LAST
 		:param input_x: Should be a 4D array like:
-							(batch_num, channel_num, img_len, img_len)
+			(batch_num, channel_num, img_len, img_len)
 		:param in_channel: The number of channels
 		:param out_channel: number of filters required
 		:param kernel_size: kernel size
 		:param random_seed: random seed
 		:param index: The layer index used for naming
-		"""
+	"""
+	def __init__(self,
+		input_x, in_channel, out_channel,
+		kernel_size, random_seed, data_format='NHWC', m=0
+	):
+	
 		assert len(input_x.shape) == 4
 		if data_format == 'NHWC':
 			assert input_x.shape[1] == input_x.shape[2]
@@ -297,6 +305,7 @@ class spectral_conv_layer(object):
 				tf.ifft2d(tf.transpose(spectral_weight, [2, 3, 0, 1])),
 				[2, 3, 0, 1]
 			)
+			
 			spatial_weight = tf.real(
 				complex_spatial_weight,
 				name='spatial_weight_{0}'.format(m)
@@ -309,17 +318,22 @@ class spectral_conv_layer(object):
 				padding="SAME",
 				data_format=data_format
 			)
-			self.cell_out = tf.nn.relu(tf.nn.bias_add(conv_out, bias, data_format=data_format))
+			
+			self.cell_out = tf.nn.relu(
+				tf.nn.bias_add(conv_out, bias, data_format=data_format)
+			)
 
 	def output(self):
 		return self.cell_out
 
 
 class global_average_layer(object):
-	def __init__(self, input_x, m=0):
-		"""
+	
+	"""==================================================================================
 		:param input_x: The input of the last convolution layer, channels last
-		"""
+	"""
+	def __init__(self, input_x, m=0):
+	
 		with tf.variable_scope('global_average_{0}'.format(m)):
 			self.cell_out = tf.reduce_mean(
 				input_x,
