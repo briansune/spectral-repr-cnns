@@ -39,12 +39,8 @@ def download_cifar10(download_100=False):
 	tar.extractall()
 	tar.close()
 
-
-def load_cifar10(num_batches=5,
-				 get_test_data=True,
-				 channels_last=True):
-	"""Load the cifar data.
-
+"""==================================================================================
+	Load the cifar data.
 	Args:
 		num_batches: int, the number of batches of data to return
 		get_test_data: bool, whether to return test data
@@ -52,9 +48,15 @@ def load_cifar10(num_batches=5,
 		(images, labels) it get_test_data False
 		(images, labels, test_images, test_labels) otherwise
 		images are numpy arrays of shape:
-					(num_images, num_channels, width, height)
+			(num_images, num_channels, width, height)
 		labels are 1D numpy arrays
-	"""
+"""
+def load_cifar10(
+	num_batches=5,
+	get_test_data=True,
+	channels_last=True
+):
+
 	assert num_batches <= 5
 	# download if not exists:
 	download_cifar10()
@@ -112,20 +114,22 @@ def load_cifar10(num_batches=5,
 
 	return images, labels, test_images, test_labels
 
-
-def load_cifar100(get_test_data=True,
-				  channels_last=True):
-	"""Load the cifar 100 data (not in batches).
-
+"""==================================================================================
+	Load the cifar 100 data (not in batches).
 	Args:
 		get_test_data: bool, whether to return test data
 	Returns:
 		(images, labels) it get_test_data False
 		(images, labels, test_images, test_labels) otherwise
 		images are numpy arrays of shape:
-					(num_images, num_channels, width, height)
+			(num_images, num_channels, width, height)
 		labels are 1D numpy arrays
-	"""
+"""
+def load_cifar100(
+	get_test_data=True,
+	channels_last=True
+):
+
 	download_cifar10(download_100=True)
 
 	# load batches in order:
@@ -166,11 +170,11 @@ def load_cifar100(get_test_data=True,
 
 	return images, labels, test_images, test_labels
 
-
+"""==================================================================================
+	Strip large constant values from graph_def.
+"""
 def strip_consts(graph_def, max_const_size=32):
-	"""Strip large constant values from graph_def.
-	This function has been taken from the homework assignments
-	given by the TAs"""
+	
 	strip_def = tf.GraphDef()
 	for n0 in graph_def.node:
 		n = strip_def.node.add()
@@ -182,11 +186,11 @@ def strip_consts(graph_def, max_const_size=32):
 				tensor.tensor_content = "<stripped %d bytes>" % size
 	return strip_def
 
-
+"""==================================================================================
+	Visualize TensorFlow graph.
+"""
 def show_graph(graph_def, max_const_size=32):
-	"""Visualize TensorFlow graph.
-	This function has been taken from the homework assignments
-	given by the TAs"""
+	
 	if hasattr(graph_def, 'as_graph_def'):
 		graph_def = graph_def.as_graph_def()
 	strip_def = strip_consts(graph_def, max_const_size=max_const_size)
