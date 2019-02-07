@@ -4,27 +4,33 @@ import os
 import numpy as np
 __DEFAULT_PATH = '../Images'
 
-
+"""==================================================================================
+	Open an image file with Pillow.
+"""
 def open_image(filename, path=__DEFAULT_PATH):
-	"""Open an image file with Pillow."""
+	
 	if filename is None:
 		raise ValueError('Filename is required.')
 	full_path = os.path.join(path, filename)
 	im = Image.open(full_path).convert('RGBA')
 	return im
 
-
+"""==================================================================================
+	Save a pillow image as a PNG.
+"""
 def save_derived_image(im, filename=None, path=__DEFAULT_PATH):
-	"""Save a pillow image as a PNG."""
+	
 	if filename is None:
 		filename = 'Derived/{0:08x}.png'.format(np.random.randint(2 ** 31))
 	full_path = os.path.join(path, filename)
 	os.makedirs(os.path.dirname(full_path), exist_ok=True)
 	im.save(full_path, 'PNG')
 
-
+"""==================================================================================
+	Rescale an image to a smaller image.
+"""
 def downscale_image(orig_image, max_width, max_height):
-	"""Rescale an image to a smaller image."""
+	
 	orig_width = orig_image.width
 	orig_height = orig_image.height
 
@@ -43,7 +49,12 @@ def downscale_image(orig_image, max_width, max_height):
 
 	return new_image
 
-
+"""==================================================================================
+	Add an image to a background image.
+	If background_image is None, the function will create a solid
+	grey background image of dimensions (background_width, background_height)
+	and paste the image onto that.
+"""
 def add_to_background(
 	foreground_image,
 	destination_left,
@@ -54,12 +65,7 @@ def add_to_background(
 	background_width=128,
 	background_height=128,
 ):
-	"""Add an image to a background image.
 
-	If background_image is None, the function will create a solid
-	grey background image of dimensions (background_width, background_height)
-	and paste the image onto that.
-	"""
 	if background_image is None:
 		new_background_image = Image.new(
 			'RGBA',
@@ -79,20 +85,22 @@ def add_to_background(
 		box=(destination_left, destination_top),
 		mask=rescaled_foreground_image
 	)
-
+	
 	return new_background_image
 
-
+"""==================================================================================
+	Generate random coordinates where a scaled image can be placed.
+"""
 def make_random_size(destination_width=128, destination_height=128):
-	"""Generate random coordinates where a scaled image can be placed."""
+	
 	scale = np.random.randint(
 		16,
 		1 + min(destination_width, destination_height)
 	)
-
+	
 	left = np.random.randint(0, 1 + destination_width - scale)
 	top = np.random.randint(0, 1 + destination_height - scale)
 	width = scale
 	height = scale
-
+	
 	return left, top, width, height
